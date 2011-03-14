@@ -6,5 +6,6 @@
     android:layout_height="fill_parent"
     android:clickable="true"
     android:apiKey="0xWU83z0wooxB-spPTivBWXJmIwj99eEIVdy_Ag" /> 
-    <!-- android:apiKey="0xWU83z0woozuTZbwJnm7rrDq2zWuMa8h1bxyOw" -->
+    <!-- Leaving the debug API Key here just in case
+    android:apiKey="0xWU83z0woozuTZbwJnm7rrDq2zWuMa8h1bxyOw" -->
     
