@@ -1,9 +1,8 @@
 package info.homepluspower.nearbymetars;
 
 import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
+import android.app.ProgressDialog;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -25,33 +24,20 @@ public class NearbyMetars extends MapActivity implements LocationListener {
 	private static MetarList metarList = null;
 	private static LocationManager locationManager;
 	
-	private MetarDataRetriever dataRetrieverTask;
-	
 	/**
      * Do the retrieval and parsing of metar data. This assumes that metarList will be instantiated by someone else
      * @param location
      */
     private void parseMetarData(Location location) {
-    	if(dataRetrieverTask != null) {
-    		Log.d("NearbyMetars", "Cancelling existing metar processing");
-    		if(dataRetrieverTask.getStatus() == MetarDataRetriever.Status.RUNNING)
-    		{
-    			dataRetrieverTask.cancel(true);
-    			try {
-    				Log.d("NearbyMetars", "Waiting for existing retrieval to return");
-					dataRetrieverTask.get();
-				} catch (InterruptedException e) {
-				} catch (ExecutionException e) {
-				} catch (CancellationException e) {					
-				}
-				Log.d("NearbyMetars", "Existing retrieval back");
-    		}
-    		else
-    			Log.d("NearbyMetars", "Existing retrieval already cancelled");
-    	}
+    	MetarDataRetriever dataRetriever = new MetarDataRetriever();
     	
-    	Log.d("NearbyMetars", "Start retrieving new data");
-    	dataRetrieverTask = (MetarDataRetriever)new MetarDataRetriever().execute(metarList, location);
+    	Log.d("NearbyMetars", "Showing progress dialog");
+    	ProgressDialog dialog = ProgressDialog.show(mapView.getContext(), "Getting Metar Data", "Retrieving METAR data. Stand-by", true);
+    	
+    	dataRetriever.getMetarData(metarList, location);
+    	
+    	dialog.cancel();
+    	Log.d("NearbyMetars", "Closing dialog");
     }
     
     private void getMetarData(Location location) {
@@ -98,11 +84,6 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     protected void onPause() {
     	super.onPause();
     	Log.d("NearbyMetars", "Pause");
-    	
-    	if(dataRetrieverTask != null) {
-    		dataRetrieverTask.cancel(true);
-    		dataRetrieverTask = null;
-    	}
     	
     	locationManager.removeUpdates(this);
     }

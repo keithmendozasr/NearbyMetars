@@ -25,14 +25,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.location.Location;
-import android.os.AsyncTask;
 import android.util.Log;
 
 /**
  * @author mendozak
  *
  */
-public class MetarDataRetriever extends AsyncTask<Object, Void, MetarList> {
+public class MetarDataRetriever {
 	
 	private class MetarParser extends DefaultHandler {
 		private String text;
@@ -54,12 +53,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, MetarList> {
 		
 		@Override
 		public void startElement(String URI, String localName, String qName, Attributes attributes) throws SAXException {
-			if(isCancelled()) {
-				Log.d("NearbyMetars", "Parsing cancel detected at startElement");
-				throw new SAXException("parsing cancelled");
-			}
-			
-			Log.d("NearbyMetarsParser", "Start element: " + localName);
+			Log.v("NearbyMetars", "Start element: " + localName);
 			if(localName.equals("sky_condition")) {
 				String cover = attributes.getValue("sky_cover");
 				SkyConds tmpSkyCond = SkyConds.valueOf(cover);
@@ -70,12 +64,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, MetarList> {
 		
 		@Override
 		public void endElement(String URI, String localName, String qName) throws SAXException {
-			if(isCancelled()) {
-				Log.d("NearbyMetars", "Parsing cancel detected at endElement");
-				throw new SAXException("parsing cancelled");
-			}
-			
-			Log.d("NearbyMetarsParser", "End element: " + localName);
+			Log.v("NearbyMetars", "End element: " + localName);
 			
 			if(localName.equals("METAR")) {
 				Log.d("NearbyMetars", "Inserting MetarItem\nLocation: " + location + "\nSky condition: " + skyCond.toString());
@@ -98,17 +87,13 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, MetarList> {
 		@Override
 		public void characters(char[] ch, int start, int length) {
 			String tmp = new String(ch);
-			Log.d("NearbyMetarsParser", "characters: >>>" + tmp + "<<< start: " + Integer.toString(start) + " length: " + Integer.toString(length));
-			Log.d("NearbyMetarsParser", "Substring to append: " + tmp.substring(start, start+length));
+			Log.v("NearbyMetars", "characters: >>>" + tmp + "<<< start: " + Integer.toString(start) + " length: " + Integer.toString(length));
+			Log.v("NearbyMetars", "Substring to append: " + tmp.substring(start, start+length));
 			text = text + tmp.substring(start, start+length).trim();
 		}
 	}
 	
-	@Override
-	protected MetarList doInBackground(Object... params) {
-		MetarList list = (MetarList)params[0];
-		Location location = (Location)params[1];
-		
+	public boolean getMetarData(MetarList list, Location location) {
 		String url = "http://weather.aero/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=1&mostRecentForEachStation=true&radialDistance=50;" + Double.toString(location.getLongitude()) + "," + Double.toString(location.getLatitude());
 		list.reset();
 		Log.d("NearbyMetars", "URL to use: " + url);
@@ -118,12 +103,11 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, MetarList> {
 			
 			parser.parse(url, new MetarParser(list));
 		} catch(Exception e) {
-			if(isCancelled())
-				Log.d("NearbyMetars", "Cancelling parsing");
-			else
-				Log.e("NearbyMetars", "Parsing exception: " + e.getMessage());
+			Log.e("NearbyMetars", "Parsing exception: " + e.getMessage());
+			return false;
 		}
-		return list;
+		
+		return true;
 	}
 	
 }
