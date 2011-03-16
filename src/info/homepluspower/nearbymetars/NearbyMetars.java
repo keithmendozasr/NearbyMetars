@@ -1,6 +1,8 @@
 package info.homepluspower.nearbymetars;
 
 import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 import android.app.ProgressDialog;
 import android.location.Location;
@@ -29,17 +31,22 @@ public class NearbyMetars extends MapActivity implements LocationListener {
      * @param location
      */
     private void parseMetarData(Location location) {
-    	MetarDataRetriever dataRetriever = new MetarDataRetriever();
-    	
-    	Log.d("NearbyMetars", "Showing progress dialog");
-    	ProgressDialog dialog = ProgressDialog.show(mapView.getContext(), "Getting Metar Data", "Retrieving METAR data. Stand-by", true);
-    	
-    	dataRetriever.getMetarData(metarList, location);
-    	
-    	dialog.cancel();
-    	Log.d("NearbyMetars", "Closing dialog");
-    	
-    	mapView.invalidate();
+    	MetarDataRetriever dataRetriever = new MetarDataRetriever(NearbyMetars.this, mapView);
+    	try {
+    		dataRetriever.execute(metarList, location);
+    	} catch(IllegalStateException e) {
+    		Log.d("NearbyMetars", "In the middle of another processing. Stop that one");
+    		dataRetriever.cancel(true);
+    		try {
+    			dataRetriever.get();
+    		} catch(CancellationException f) {
+    		} catch(ExecutionException f) {    			
+    		} catch(InterruptedException f) {    			
+    		} finally {
+    			dataRetriever.execute(metarList, location);
+    		}
+    		
+    	}
     }
     
     private void getMetarData(Location location) {
