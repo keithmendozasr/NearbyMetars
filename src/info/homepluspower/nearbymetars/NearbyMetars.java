@@ -38,6 +38,8 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     	
     	dialog.cancel();
     	Log.d("NearbyMetars", "Closing dialog");
+    	
+    	mapView.invalidate();
     }
     
     private void getMetarData(Location location) {
