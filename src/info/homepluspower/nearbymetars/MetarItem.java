@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
@@ -37,7 +38,12 @@ public class MetarItem extends OverlayItem {
 		
 		projection.toPixels(mPoint, point);
 		float project = projection.metersToEquatorPixels((float) 1609.344);
-
+		Log.d("NearbyMetars", "Value of project: " + Float.toString(project));
+		if(project < 10.0) {
+			Log.v("NearbyMetars", "Changing project to 10");
+			project = 10.0f;
+		}
+		
 		Paint paint = new Paint();
 		
 		switch(skyCond) {

@@ -26,6 +26,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -35,7 +36,7 @@ import android.view.View;
  * @author mendozak
  *
  */
-public class MetarDataRetriever extends AsyncTask<Object, Void, Void> {
+public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements DialogInterface.OnCancelListener {
 	
 	private class MetarParser extends DefaultHandler {
 		private String text;
@@ -119,7 +120,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> {
 	@Override
 	protected void onPreExecute() {
 		Log.d("NearbyMetars", "Show progress dialog");
-		dialog = ProgressDialog.show(callerContext, "", "Getting METAR data, standby");
+		dialog = ProgressDialog.show(callerContext, "", "Getting METAR data, standby", true, true, this);
 	}
 	
 	@Override
@@ -149,5 +150,14 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> {
 		Log.d("NearbyMetars", "Close progress dialog");
 		dialog.dismiss();
 		view.postInvalidate();
+	}
+	
+	@Override
+	protected void onCancelled() {
+		dialog.dismiss();
+	}
+
+	public void onCancel(DialogInterface dialog) {
+		this.cancel(true);		
 	}
 }

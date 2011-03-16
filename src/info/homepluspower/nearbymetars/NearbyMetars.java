@@ -1,13 +1,11 @@
 package info.homepluspower.nearbymetars;
 
 import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
-import android.app.ProgressDialog;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -25,28 +23,26 @@ public class NearbyMetars extends MapActivity implements LocationListener {
 	private static MapView mapView;
 	private static MetarList metarList = null;
 	private static LocationManager locationManager;
+	private static MetarDataRetriever dataRetriever;
 	
 	/**
      * Do the retrieval and parsing of metar data. This assumes that metarList will be instantiated by someone else
      * @param location
      */
     private void parseMetarData(Location location) {
-    	MetarDataRetriever dataRetriever = new MetarDataRetriever(NearbyMetars.this, mapView);
-    	try {
-    		dataRetriever.execute(metarList, location);
-    	} catch(IllegalStateException e) {
+    	if(dataRetriever!= null && dataRetriever.getStatus() == AsyncTask.Status.RUNNING) {
     		Log.d("NearbyMetars", "In the middle of another processing. Stop that one");
     		dataRetriever.cancel(true);
     		try {
     			dataRetriever.get();
-    		} catch(CancellationException f) {
-    		} catch(ExecutionException f) {    			
-    		} catch(InterruptedException f) {    			
-    		} finally {
-    			dataRetriever.execute(metarList, location);
+    		} catch(Exception e) {
+    			Log.d("NearbyMetars", "Previous processing stopped");
     		}
-    		
     	}
+    	else
+    		Log.d("NearbyMetars", "No running process");
+    		
+    	dataRetriever = (MetarDataRetriever) new MetarDataRetriever(NearbyMetars.this, mapView).execute(metarList, location);
     }
     
     private void getMetarData(Location location) {
@@ -73,6 +69,14 @@ public class NearbyMetars extends MapActivity implements LocationListener {
         mapView = (MapView)findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
         mapView.preLoad();
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(location != null) {
+        	MapController controller = mapView.getController();
+        	controller.animateTo(MetarItem.coordsToGeoPoint(location.getLatitude(), location.getLongitude()));
+        	controller.setZoom(10);
+        	getMetarData(location);
+        }
+        	
     }
     
     @Override
