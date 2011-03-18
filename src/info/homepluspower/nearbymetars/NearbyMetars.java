@@ -2,6 +2,7 @@ package info.homepluspower.nearbymetars;
 
 import java.util.List;
 
+import android.app.ProgressDialog;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,11 +20,12 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 
 public class NearbyMetars extends MapActivity implements LocationListener {
-    /** Called when the activity is first created. */
-	private static MapView mapView;
+    private static MapView mapView;
 	private static MetarList metarList = null;
 	private static LocationManager locationManager;
 	private static MetarDataRetriever dataRetriever;
+	
+	private static ProgressDialog waitForLocationDlg;
 	
 	/**
      * Do the retrieval and parsing of metar data. This assumes that metarList will be instantiated by someone else
@@ -69,14 +71,6 @@ public class NearbyMetars extends MapActivity implements LocationListener {
         mapView = (MapView)findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
         mapView.preLoad();
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(location != null) {
-        	MapController controller = mapView.getController();
-        	controller.animateTo(MetarItem.coordsToGeoPoint(location.getLatitude(), location.getLongitude()));
-        	controller.setZoom(10);
-        	getMetarData(location);
-        }
-        	
     }
     
     @Override
@@ -89,20 +83,32 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     	super.onResume();
     	Log.d("NearbyMetars", "Resume");
     	
+    	waitForLocationDlg = ProgressDialog.show(this, "Wait for location", "Determining location, stand-by");
+    	
     	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 300000L, 1609.344f, this);
     	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 300000L, 1609.344f, this);
+    }
+    
+    private void cancelWaitForLocation() {
+    	if(waitForLocationDlg != null) {
+			waitForLocationDlg.cancel();
+			waitForLocationDlg = null;
+		}
     }
     
     @Override
     protected void onPause() {
     	super.onPause();
     	Log.d("NearbyMetars", "Pause");
-    	
+    	cancelWaitForLocation();
     	locationManager.removeUpdates(this);
     }
 
     public void onLocationChanged(Location location) {
 		Log.d("NearbyMetars", "Got new location");
+		
+		cancelWaitForLocation();
+		
 		MapController controller = mapView.getController();
 		controller.animateTo(MetarItem.coordsToGeoPoint(location.getLatitude(), location.getLongitude()));
 		controller.setZoom(10);
