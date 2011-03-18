@@ -13,6 +13,7 @@ import com.google.android.maps.Projection;
 
 public class MetarItem extends OverlayItem {
 	public static enum SkyConds {
+		SKC, //SKC and CLR mean the same thing
 		CLR,
 		FEW,
 		SCT,
@@ -48,6 +49,7 @@ public class MetarItem extends OverlayItem {
 		
 		switch(skyCond) {
 		case CLR:
+		case SKC:
 			paint.setARGB(204, 255, 255, 255);
 			break;
 		case FEW:
