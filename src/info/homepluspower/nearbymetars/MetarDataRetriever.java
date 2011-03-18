@@ -17,6 +17,9 @@ package info.homepluspower.nearbymetars;
 
 import info.homepluspower.nearbymetars.MetarItem.SkyConds;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -82,6 +85,11 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 			Log.d("NearbyMetarsParser", "End element: " + localName);
 			
 			if(localName.equals("METAR")) {
+				if(skyCond == null) {
+					Log.e("NearbyMetars", "Sky condition for " + location +" not known. Skipping");
+					return;
+				}
+				
 				Log.d("NearbyMetars", "Inserting MetarItem\nLocation: " + location + "\nSky condition: " + skyCond.toString());
 				MetarItem metarItem = new MetarItem(MetarItem.coordsToGeoPoint(latitude, longitude), location, rawMetar, skyCond);
 				list.addOverlay(metarItem);
@@ -136,11 +144,15 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 			SAXParser parser = factory.newSAXParser();
 			
 			parser.parse(url, new MetarParser(list));
-		} catch(Exception e) {
+		} catch(SAXException e) {
 			if(isCancelled())
 				Log.d("NearbyMetars", "Cancelling parsing");
 			else
 				Log.e("NearbyMetars", "Parsing exception: " + e.getMessage());
+		} catch(IOException e) {
+			Log.e("NearbyMetars", "Failed to retrieve data");
+		} catch(ParserConfigurationException e) {
+			Log.e("NearbyMetars", "No matching SAX parser");
 		}
 		return null;
 	}
