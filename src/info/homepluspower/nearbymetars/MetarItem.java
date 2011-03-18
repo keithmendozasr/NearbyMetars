@@ -39,7 +39,7 @@ public class MetarItem extends OverlayItem {
 		
 		projection.toPixels(mPoint, point);
 		float project = projection.metersToEquatorPixels((float) 1609.344);
-		Log.d("NearbyMetars", "Value of project: " + Float.toString(project));
+		Log.v("NearbyMetars", "Value of project: " + Float.toString(project));
 		if(project < 10.0) {
 			Log.v("NearbyMetars", "Changing project to 10");
 			project = 10.0f;

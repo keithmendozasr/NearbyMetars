@@ -66,7 +66,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 				throw new SAXException("parsing cancelled");
 			}
 			
-			Log.d("NearbyMetarsParser", "Start element: " + localName);
+			Log.v("NearbyMetars", "Start element: " + localName);
 			if(localName.equals("sky_condition")) {
 				String cover = attributes.getValue("sky_cover");
 				SkyConds tmpSkyCond = SkyConds.valueOf(cover);
@@ -82,7 +82,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 				throw new SAXException("parsing cancelled");
 			}
 			
-			Log.d("NearbyMetarsParser", "End element: " + localName);
+			Log.v("NearbyMetars", "End element: " + localName);
 			
 			if(localName.equals("METAR")) {
 				if(skyCond == null) {
@@ -110,8 +110,8 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 		@Override
 		public void characters(char[] ch, int start, int length) {
 			String tmp = new String(ch);
-			Log.d("NearbyMetarsParser", "characters: >>>" + tmp + "<<< start: " + Integer.toString(start) + " length: " + Integer.toString(length));
-			Log.d("NearbyMetarsParser", "Substring to append: " + tmp.substring(start, start+length));
+			Log.v("NearbyMetars", "characters: >>>" + tmp + "<<< start: " + Integer.toString(start) + " length: " + Integer.toString(length));
+			Log.v("NearbyMetars", "Substring to append: " + tmp.substring(start, start+length));
 			text = text + tmp.substring(start, start+length).trim();
 		}
 	}
