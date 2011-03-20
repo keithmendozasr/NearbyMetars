@@ -18,7 +18,8 @@ public class MetarItem extends OverlayItem {
 		FEW,
 		SCT,
 		BKN,
-		OVC
+		OVC,
+		OVX
 	}
 	
 	private SkyConds skyCond;
@@ -62,6 +63,7 @@ public class MetarItem extends OverlayItem {
 			paint.setARGB(153, 0, 0, 0);
 			break;
 		case OVC:
+		case OVX:
 			paint.setARGB(204, 0, 0, 0);
 			break;
 		}
