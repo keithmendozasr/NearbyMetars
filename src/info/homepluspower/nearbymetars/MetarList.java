@@ -19,6 +19,7 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	public MetarList(Drawable defaultMarker, Context context) {
 		super(boundCenter(defaultMarker));
 		mContext = context;
+		populate();
 	}
 	
 	public void addOverlay(MetarItem overlay) {
@@ -29,23 +30,18 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	
 	@Override
 	protected MetarItem createItem(int i) {
-		return mOverlays.get(i);
+			return mOverlays.get(i);
 	}
 
 	@Override
 	public int size() {
+		Log.v("NearbyMetars", "size called, returning " + Integer.toString(mOverlays.size()));
 		return mOverlays.size();
 	}
 
 	@Override
 	protected boolean onTap(int index) {
-		Log.v("NearbyMetars", "Item tapped");
-		if(index >= size()) {
-			Log.e("NearbyMetars", "Requesting index outside available items");
-			Log.d("NearbyMetars", "index value: " + Integer.toString(index) + " number of items available: " + Integer.toString(size()));
-			return false; 
-		}
-		
+		Log.v("NearbyMetars", "Item tapped with index " + Integer.toString(index));
 		OverlayItem item = mOverlays.get(index);
 		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
 		dialog.setTitle(item.getTitle());
