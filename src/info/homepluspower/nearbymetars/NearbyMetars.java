@@ -31,7 +31,7 @@ public class NearbyMetars extends MapActivity implements LocationListener {
      * Do the retrieval and parsing of metar data. This assumes that metarList will be instantiated by someone else
      * @param location
      */
-    private void parseMetarData(Location location) {
+    private void getMetarData(Location location) {
     	if(dataRetriever!= null && dataRetriever.getStatus() == AsyncTask.Status.RUNNING) {
     		Log.d("NearbyMetars", "In the middle of another processing. Stop that one");
     		dataRetriever.cancel(true);
@@ -47,20 +47,6 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     	dataRetriever = (MetarDataRetriever) new MetarDataRetriever(NearbyMetars.this, mapView).execute(metarList, location);
     }
     
-    private void getMetarData(Location location) {
-    	if(metarList == null) {
-    		Log.d("NearbyMetars", "First time loading MetarList");
-    		metarList = new MetarList(getResources().getDrawable(R.drawable.overlaydefault), mapView.getContext());
-    		parseMetarData(location);
-    		List<Overlay> mapOverlays = mapView.getOverlays();
-            mapOverlays.add(metarList);
-    	}
-    	else {
-    		Log.d("NearbyMetars", "Refreshing existing MetarList");
-    		parseMetarData(location);
-    	}
-    }
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +57,9 @@ public class NearbyMetars extends MapActivity implements LocationListener {
         mapView = (MapView)findViewById(R.id.mapview);
         mapView.setBuiltInZoomControls(true);
         mapView.preLoad();
+        
+        metarList = new MetarList(getResources().getDrawable(R.drawable.overlaydefault), mapView.getContext());
+        mapView.getOverlays().add(metarList);
     }
     
     @Override
