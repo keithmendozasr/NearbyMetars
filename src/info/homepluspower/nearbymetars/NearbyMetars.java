@@ -85,11 +85,6 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     	super.onResume();
     	Log.d("NearbyMetars", "Resume");
     	
-    	if(metarList.size() > 0) {
-    		Log.d("NearbyMetars", "Already have METAR data, proceeding");
-    		return;
-    	}
-    	
     	Log.d("NearbyMetars", "Need to get METAR data");
     	waitForLocationDlg = ProgressDialog.show(this, "Wait for location", "Determining location, stand-by", true, true);
     	
