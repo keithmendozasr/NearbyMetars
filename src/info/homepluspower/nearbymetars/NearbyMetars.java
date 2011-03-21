@@ -1,15 +1,22 @@
 package info.homepluspower.nearbymetars;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -78,6 +85,12 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     	super.onResume();
     	Log.d("NearbyMetars", "Resume");
     	
+    	if(metarList.size() > 0) {
+    		Log.d("NearbyMetars", "Already have METAR data, proceeding");
+    		return;
+    	}
+    	
+    	Log.d("NearbyMetars", "Need to get METAR data");
     	waitForLocationDlg = ProgressDialog.show(this, "Wait for location", "Determining location, stand-by", true, true);
     	
     	startLocationListener();
@@ -144,6 +157,27 @@ public class NearbyMetars extends MapActivity implements LocationListener {
 		case R.id.getmetarloc:
 			Log.v("NearbyMetars", "Get metar at current location from GPS");
 			startLocationListener();
+			return true;
+		case R.id.showabout:
+			final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			final AlertDialog dialog = builder.create();
+			dialog.setTitle("About " + getText(R.string.app_name));
+			
+			final TextView textView = new TextView(this);
+			final String msgText = "Version " + getText(R.string.app_version) + "Go to http://androidapp.homepluspower.info/NearbyMetars/ for more info";
+			final SpannableString s = new SpannableString(msgText);
+			Linkify.addLinks(s, Linkify.WEB_URLS);
+			textView.setText(s);
+			textView.setMovementMethod(LinkMovementMethod.getInstance());
+			textView.setOnClickListener(
+					new OnClickListener() {
+						public void onClick(View v) {
+							dialog.dismiss();
+						}
+					}
+					);
+			dialog.setView(textView);
+			dialog.show();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

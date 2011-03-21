@@ -3,4 +3,5 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:title="@string/menu_getfromhere" android:id="@+id/getmetar"></item>
     <item android:id="@+id/getmetarloc" android:title="@string/menu_getmetarlocation"></item>
+    <item android:id="@+id/showabout" android:title="@string/menu_about"></item>
 </menu>
