@@ -34,6 +34,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 /**
  * @author mendozak
@@ -131,6 +132,11 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 		dialog = ProgressDialog.show(callerContext, "", "Getting METAR data, standby", true, true, this);
 	}
 	
+	private void showToastMsg(String msg) {
+		Toast toast = Toast.makeText(callerContext, msg, Toast.LENGTH_SHORT);
+		toast.show();
+	}
+	
 	@Override
 	protected Void doInBackground(Object... params) {
 		MetarList list = (MetarList)params[0];
@@ -147,12 +153,16 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 		} catch(SAXException e) {
 			if(isCancelled())
 				Log.d("NearbyMetars", "Cancelling parsing");
-			else
+			else {
 				Log.e("NearbyMetars", "Parsing exception: " + e.getMessage());
+				showToastMsg("Parsing exception: " + e.getMessage());
+			}	
 		} catch(IOException e) {
 			Log.e("NearbyMetars", "Failed to retrieve data");
+			showToastMsg("Failed to retrieve METAR data, try again later");
 		} catch(ParserConfigurationException e) {
 			Log.e("NearbyMetars", "No matching SAX parser");
+			showToastMsg("No matching SAX parser");
 		}
 		return null;
 	}
