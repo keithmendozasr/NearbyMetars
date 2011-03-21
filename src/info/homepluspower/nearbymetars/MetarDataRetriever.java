@@ -41,7 +41,6 @@ import android.widget.Toast;
  *
  */
 public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements DialogInterface.OnCancelListener {
-	
 	private class MetarParser extends DefaultHandler {
 		private String text;
 		private MetarList list;
@@ -121,6 +120,9 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 	private ProgressDialog dialog;
 	private View view;
 	
+	//Stuff for Toast message
+	String toastMsg = null;
+	
 	public MetarDataRetriever(Context callerContext, View view) {
 		this.callerContext = callerContext;
 		this.view = view;
@@ -130,11 +132,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 	protected void onPreExecute() {
 		Log.d("NearbyMetars", "Show progress dialog");
 		dialog = ProgressDialog.show(callerContext, "", "Getting METAR data, standby", true, true, this);
-	}
-	
-	private void showToastMsg(String msg) {
-		Toast toast = Toast.makeText(callerContext, msg, Toast.LENGTH_SHORT);
-		toast.show();
+		toastMsg = null;
 	}
 	
 	@Override
@@ -142,7 +140,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 		MetarList list = (MetarList)params[0];
 		Location location = (Location)params[1];
 		
-		String url = "http://weather.aero/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=1&mostRecentForEachStation=true&radialDistance=50;" + Double.toString(location.getLongitude()) + "," + Double.toString(location.getLatitude());
+		String url = "http://weather.aero/dataserver1_4/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=1&mostRecentForEachStation=constraint&radialDistance=50;" + Double.toString(location.getLongitude()) + "," + Double.toString(location.getLatitude());
 		list.reset();
 		Log.d("NearbyMetars", "URL to use: " + url);
 		try {
@@ -155,22 +153,29 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 				Log.d("NearbyMetars", "Cancelling parsing");
 			else {
 				Log.e("NearbyMetars", "Parsing exception: " + e.getMessage());
-				showToastMsg("Parsing exception: " + e.getMessage());
+				toastMsg = new String("Parsing exception: " + e.getMessage());
 			}	
 		} catch(IOException e) {
 			Log.e("NearbyMetars", "Failed to retrieve data");
-			showToastMsg("Failed to retrieve METAR data, try again later");
+			toastMsg = new String("Failed to retrieve METAR data, try again later");
 		} catch(ParserConfigurationException e) {
 			Log.e("NearbyMetars", "No matching SAX parser");
-			showToastMsg("No matching SAX parser");
+			toastMsg = new String("No matching SAX parser.");
 		}
 		return null;
 	}
 	
 	@Override
 	protected void onPostExecute (Void result) {
-		Log.d("NearbyMetars", "Close progress dialog");
+		Log.v("NearbyMetars", "onPostExecute");
+		Log.v("NearbyMetars", "Close progress dialog");
 		dialog.dismiss();
+		
+		if(toastMsg != null) {
+			Log.v("NearbyMetars", "Showing toast message");
+			Toast.makeText(callerContext, toastMsg, Toast.LENGTH_LONG).show();
+		}
+		
 		view.postInvalidate();
 	}
 	
