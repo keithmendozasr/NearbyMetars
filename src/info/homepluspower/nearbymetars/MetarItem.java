@@ -13,7 +13,7 @@ import com.google.android.maps.Projection;
 
 public class MetarItem extends OverlayItem {
 	public static enum SkyConds {
-		SKC, //SKC and CLR mean the same thing
+		SKC,
 		CLR,
 		FEW,
 		SCT,
@@ -31,50 +31,57 @@ public class MetarItem extends OverlayItem {
 	public MetarItem(GeoPoint p, String location, String rawMetar, SkyConds skyCond) {
 		super(p, location, rawMetar);
 		this.skyCond = skyCond;
-		
 	}
-	
-	public void draw(Canvas canvas, MapView mapView) {
-		Projection projection = mapView.getProjection();
-		Point point = new Point();
 		
+	public void draw(Canvas canvas, MapView mapView) {
+		//Get the bounds of the icon
+		Point point = new Point();
+		Projection projection = mapView.getProjection();
 		projection.toPixels(mPoint, point);
-		float project = projection.metersToEquatorPixels((float) 1609.344);
+		float project = projection.metersToEquatorPixels((float)1609.344);
 		Log.v("NearbyMetars", "Value of project: " + Float.toString(project));
 		if(project < 10.0) {
 			Log.v("NearbyMetars", "Changing project to 10");
 			project = 10.0f;
 		}
+		final RectF drawPos = new RectF(point.x-project, point.y-project, point.x+project, point.y+project);
 		
+		//Get the paint to use for drawing the icons
 		Paint paint = new Paint();
-		
+		paint.setStyle(Paint.Style.STROKE);
+		paint.setARGB(179, 0, 0, 0);
+		paint.setStrokeWidth(2.0f);
+		paint.setStrokeCap(Paint.Cap.BUTT);		
 		switch(skyCond) {
 		case CLR:
+			canvas.drawRect(drawPos, paint);
+			break;
 		case SKC:
-			paint.setARGB(204, 255, 255, 255);
+			canvas.drawCircle(point.x, point.y, project, paint);	
 			break;
 		case FEW:
-			paint.setARGB(51, 0, 0, 0);
+			canvas.drawCircle(point.x, point.y, project, paint);
+			canvas.drawLine(point.x, drawPos.top, point.x, drawPos.bottom, paint);
 			break;
 		case SCT:
-			paint.setARGB(102, 0, 0, 0);
+			canvas.drawArc(drawPos, 0, 270, false, paint);
+			paint.setStyle(Paint.Style.FILL_AND_STROKE);
+			canvas.drawArc(drawPos, 270, 90, true, paint);
 			break;
 		case BKN:
-			paint.setARGB(153, 0, 0, 0);
+			canvas.drawArc(drawPos, 180, 90, false, paint);
+			paint.setStyle(Paint.Style.FILL_AND_STROKE);
+			canvas.drawArc(drawPos, 270, 270, true, paint);
 			break;
 		case OVC:
+			paint.setStyle(Paint.Style.FILL_AND_STROKE);
+			canvas.drawCircle(point.x, point.y, project, paint);
+			break;
 		case OVX:
-			paint.setARGB(204, 0, 0, 0);
+			canvas.drawArc(drawPos, 45, 180, true, paint);
+			canvas.drawArc(drawPos, 135, 180, true, paint);
+			canvas.drawArc(drawPos, 315, 90, true, paint);
 			break;
 		}
-		
-		paint.setStyle(Paint.Style.FILL);
-		
-		canvas.drawCircle(point.x, point.y, project, paint);
-		
-		paint.setARGB(255, 0, 0, 0);
-		paint.setStyle(Paint.Style.STROKE);
-		RectF oval = new RectF(point.x-project, point.y-project, point.x+project, point.y+project);
-		canvas.drawArc(oval, 0, 360.0f, false, paint);
 	}
 }

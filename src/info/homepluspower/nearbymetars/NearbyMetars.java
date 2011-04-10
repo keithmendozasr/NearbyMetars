@@ -159,7 +159,7 @@ public class NearbyMetars extends MapActivity implements LocationListener {
 			dialog.setTitle("About " + getText(R.string.app_name));
 			
 			final TextView textView = new TextView(this);
-			final String msgText = "Version " + getText(R.string.app_version) + "Go to http://androidapp.homepluspower.info/NearbyMetars for more info";
+			final String msgText = "Version " + getText(R.string.app_version) + " Go to http://androidapp.homepluspower.info/NearbyMetars for more info";
 			final SpannableString s = new SpannableString(msgText);
 			Linkify.addLinks(s, Linkify.WEB_URLS);
 			textView.setText(s);
