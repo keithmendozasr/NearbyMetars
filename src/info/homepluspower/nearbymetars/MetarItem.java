@@ -32,7 +32,7 @@ public class MetarItem extends OverlayItem {
 	public MetarItem(GeoPoint p, String location, String rawMetar, SkyConds skyCond, int windDir) {
 		super(p, location, rawMetar);
 		this.skyCond = skyCond;
-		this.windDir = windDir*(Math.PI/180.0);
+		this.windDir = (windDir > 0) ? windDir*(Math.PI/180.0) : 0;
 	}
 		
 	public void draw(Canvas canvas, MapView mapView) {
@@ -82,15 +82,15 @@ public class MetarItem extends OverlayItem {
 			break;
 		}
 		
-		//Draw the wind bar
-		final float barLen = project * 3;
-		
-		//This has been modified to go the opposide direction of
-		//standard polar to cartesian plotting
-		final float endX = (float)(point.x + barLen * Math.sin(windDir));
-		final float endY = (float)(point.y - barLen * Math.cos(windDir));
-		
-		Log.d("NearbyMetars", "Value of windDir: " + Double.toString(windDir) + " Value of endX: " + Float.toString(endX) + " Value of endY: " + Float.toString(endY));
-		canvas.drawLine(point.x, point.y, endX, endY, paint);
+		//Draw the wind bar if wind is NOT variable
+		if(windDir > 0)
+		{
+			final float barLen = project * 3;
+			
+			//This has been modified to go the opposite direction of
+			//standard polar to Cartesian plotting
+			canvas.drawLine(point.x, point.y, (float)(point.x + barLen * Math.sin(windDir)), (float)(point.y - barLen * Math.cos(windDir)), paint);
+		}
+
 	}
 }
