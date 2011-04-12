@@ -23,14 +23,16 @@ public class MetarItem extends OverlayItem {
 	}
 	
 	private SkyConds skyCond;
+	private double windDir;
 	
 	public static GeoPoint coordsToGeoPoint(double latitude, double longitude) {
 		return new GeoPoint((int)(latitude *1e6), (int)(longitude *1e6));
 	}
 	
-	public MetarItem(GeoPoint p, String location, String rawMetar, SkyConds skyCond) {
+	public MetarItem(GeoPoint p, String location, String rawMetar, SkyConds skyCond, int windDir) {
 		super(p, location, rawMetar);
 		this.skyCond = skyCond;
+		this.windDir = windDir*(Math.PI/180.0);
 	}
 		
 	public void draw(Canvas canvas, MapView mapView) {
@@ -38,12 +40,8 @@ public class MetarItem extends OverlayItem {
 		Point point = new Point();
 		Projection projection = mapView.getProjection();
 		projection.toPixels(mPoint, point);
-		float project = projection.metersToEquatorPixels((float)1609.344);
-		Log.v("NearbyMetars", "Value of project: " + Float.toString(project));
-		if(project < 10.0) {
-			Log.v("NearbyMetars", "Changing project to 10");
-			project = 10.0f;
-		}
+		final float project = (float)((projection.metersToEquatorPixels((float)1609.344) > 10) ? projection.metersToEquatorPixels((float)1609.344) : 10.0);
+		Log.d("NearbyMetars", "Value of project: " + Float.toString(project));
 		final RectF drawPos = new RectF(point.x-project, point.y-project, point.x+project, point.y+project);
 		
 		//Get the paint to use for drawing the icons
@@ -83,5 +81,16 @@ public class MetarItem extends OverlayItem {
 			canvas.drawArc(drawPos, 315, 90, true, paint);
 			break;
 		}
+		
+		//Draw the wind bar
+		final float barLen = project * 3;
+		
+		//This has been modified to go the opposide direction of
+		//standard polar to cartesian plotting
+		final float endX = (float)(point.x + barLen * Math.sin(windDir));
+		final float endY = (float)(point.y - barLen * Math.cos(windDir));
+		
+		Log.d("NearbyMetars", "Value of windDir: " + Double.toString(windDir) + " Value of endX: " + Float.toString(endX) + " Value of endY: " + Float.toString(endY));
+		canvas.drawLine(point.x, point.y, endX, endY, paint);
 	}
 }
