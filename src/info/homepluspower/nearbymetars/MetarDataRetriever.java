@@ -48,7 +48,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 		private MetarItem.SkyConds skyCond;
 		private double latitude, longitude;
 		private String rawMetar, location;
-		private int windDir;
+		private int windDir, windSpeed;
 		
 		public MetarParser(MetarList list) {
 			text = new String();
@@ -92,7 +92,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 				}
 				
 				Log.d("NearbyMetars", "Inserting MetarItem\nLocation: " + location + "\nSky condition: " + skyCond.toString() + "\nWind direction: " + Integer.toString(windDir));
-				MetarItem metarItem = new MetarItem(MetarItem.coordsToGeoPoint(latitude, longitude), location, rawMetar, skyCond, windDir);
+				MetarItem metarItem = new MetarItem(MetarItem.coordsToGeoPoint(latitude, longitude), location, rawMetar, skyCond, windDir, windSpeed);
 				list.addOverlay(metarItem);
 				skyCond = null;
 			}
@@ -106,6 +106,8 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 				longitude = Double.valueOf(text);
 			else if(localName.equals("wind_dir_degrees"))
 				windDir = Integer.valueOf(text);
+			else if(localName.equals("wind_speed_kt"))
+				windSpeed = Integer.valueOf(text);
 			
 			text="";
 		}

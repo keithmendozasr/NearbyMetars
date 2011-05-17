@@ -24,15 +24,22 @@ public class MetarItem extends OverlayItem {
 	
 	private SkyConds skyCond;
 	private double windDir;
+	private int windSpeed;
+	private static final double degToRadFactor = (Math.PI/180);
 	
 	public static GeoPoint coordsToGeoPoint(double latitude, double longitude) {
 		return new GeoPoint((int)(latitude *1e6), (int)(longitude *1e6));
 	}
 	
-	public MetarItem(GeoPoint p, String location, String rawMetar, SkyConds skyCond, int windDir) {
+	private static final double degToRad(double deg) {
+		return deg * degToRadFactor;
+	}
+	
+	public MetarItem(GeoPoint p, String location, String rawMetar, SkyConds skyCond, int windDir, int windSpeed) {
 		super(p, location, rawMetar);
 		this.skyCond = skyCond;
-		this.windDir = (windDir > 0) ? windDir*(Math.PI/180.0) : 0;
+		this.windDir = (windDir > 0) ? degToRad(windDir) : 0;
+		this.windSpeed = windSpeed;
 	}
 		
 	public void draw(Canvas canvas, MapView mapView) {
@@ -40,8 +47,12 @@ public class MetarItem extends OverlayItem {
 		Point point = new Point();
 		Projection projection = mapView.getProjection();
 		projection.toPixels(mPoint, point);
-		final float project = (float)((projection.metersToEquatorPixels((float)1609.344) > 10) ? projection.metersToEquatorPixels((float)1609.344) : 10.0);
+		
+		float project = (float)(projection.metersToEquatorPixels((float)1609.344));
+		if(project < 10 )
+			project = 10.0f;
 		Log.d("NearbyMetars", "Value of project: " + Float.toString(project));
+		Log.d("NearbyMetars", "Value of point: " + point.toString());
 		final RectF drawPos = new RectF(point.x-project, point.y-project, point.x+project, point.y+project);
 		
 		//Get the paint to use for drawing the icons
@@ -85,12 +96,48 @@ public class MetarItem extends OverlayItem {
 		//Draw the wind bar if wind is NOT variable
 		if(windDir > 0)
 		{
-			final float barLen = project * 3;
+			final float dirLen = project * 3;
 			
 			//This has been modified to go the opposite direction of
 			//standard polar to Cartesian plotting
-			canvas.drawLine(point.x, point.y, (float)(point.x + barLen * Math.sin(windDir)), (float)(point.y - barLen * Math.cos(windDir)), paint);
+			float endX, endY;
+			endX = (float)(point.x + dirLen * Math.sin(windDir));
+			endY = (float)(point.y - dirLen * Math.cos(windDir));
+			canvas.drawLine(point.x, point.y, endX, endY, paint);
+			
+			//Draw the wind speed
+			Log.d("NearbyMetars", "Drawing wind barb");
+			final double barbAngle = windDir + degToRad(80);
+			final int barbSpace = (int)dirLen/8;
+			float barbX, barbY;
+			
+			if(windSpeed > 50)
+			{
+				Log.d("NearbyMetars", "Windspeed over 50, not drawing wind barb");
+				return;
+			}
+			
+			if(project<=10)
+				project = 20;
+			
+			for(int i=0; i<(int)(windSpeed/10); i++) {
+				barbX = (float)(endX + project * Math.sin(barbAngle));
+				barbY = (float)(endY - project * Math.cos(barbAngle));
+				canvas.drawLine(endX, endY, barbX, barbY, paint);
+				endX -= (float)(barbSpace*Math.sin(windDir));
+				endY += (float)(barbSpace*Math.cos(windDir));
+				
+				Log.d("NearbyMetars", "New value of endX: " + Float.toString(endX) +" New value of endY: " + Float.toString(endY));
+			}
+			
+			if((windSpeed % 10) > 0)
+			{
+				Log.d("NearbyMetars", "Drawing half-size barb");
+				barbX = (float)(endX + (project/2) * Math.sin(barbAngle));
+				barbY = (float)(endY - (project/2) * Math.cos(barbAngle));
+				canvas.drawLine(endX, endY, barbX, barbY, paint);
+			}
+			
 		}
-
 	}
 }
