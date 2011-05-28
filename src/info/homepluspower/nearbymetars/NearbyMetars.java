@@ -1,5 +1,8 @@
 package info.homepluspower.nearbymetars;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.location.Location;
@@ -28,7 +31,8 @@ public class NearbyMetars extends MapActivity implements LocationListener {
 	private static MetarList metarList = null;
 	private static LocationManager locationManager;
 	private static MetarDataRetriever dataRetriever;
-	
+	private boolean needLocation;
+	private static Calendar lastLoad;
 	private static ProgressDialog waitForLocationDlg;
 	
 	/**
@@ -48,7 +52,9 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     	else
     		Log.d("NearbyMetars", "No running process");
     		
+    	needLocation = false;
     	dataRetriever = (MetarDataRetriever) new MetarDataRetriever(NearbyMetars.this, mapView).execute(metarList, location);
+    	lastLoad = Calendar.getInstance();
     }
 
     @Override
@@ -56,6 +62,7 @@ public class NearbyMetars extends MapActivity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
+        Log.d("NearbyMetars", "onCreate called");
         locationManager = (LocationManager)this.getSystemService(LOCATION_SERVICE);
         
         mapView = (MapView)findViewById(R.id.mapview);
@@ -63,7 +70,42 @@ public class NearbyMetars extends MapActivity implements LocationListener {
         mapView.preLoad();
         
         metarList = new MetarList(getResources().getDrawable(R.drawable.overlaydefault), mapView.getContext());
+        if(savedInstanceState != null) {
+        	Log.d("NearbyMetars", "savedInstanceState not null. Getting last load time from bundle");
+        	
+        	//Stuff for debugging
+        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        	
+        	lastLoad = (Calendar) savedInstanceState.getSerializable("lastloadtime");
+        	Log.d("NearbyMetars", "Value of lastLoad: " + sdf.format(lastLoad.getTime()));
+        	
+        	Calendar curTime = Calendar.getInstance();
+        	curTime.add(Calendar.HOUR, -1);
+        	Log.d("NearbyMetars", "Current time minus 1 hour: " + sdf.format(curTime.getTime()));
+        	if(curTime.before(lastLoad)) {
+        		Log.d("NearbyMetars", "Using saved metar list");
+        		metarList.getListFromBundle(savedInstanceState);
+            	needLocation = false;
+        	}
+        	else {
+        		Log.d("NearbyMetars", "Saved data too old");
+        		needLocation = true;
+        	}
+        }
+        else {
+        	Log.d("NearbyMetars", "savedInstanceState null. Will need to download metarList data");
+        	needLocation = true;
+        }
+        
         mapView.getOverlays().add(metarList);
+    }
+    
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+    	super.onSaveInstanceState(outState);
+    	Log.d("NearbyMetars", "Saving metarList to bundle");
+    	outState.putSerializable("lastloadtime", lastLoad);
+    	metarList.saveListToBundle(outState);
     }
     
     @Override
@@ -84,6 +126,11 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     protected void onResume() {
     	super.onResume();
     	Log.d("NearbyMetars", "Resume");
+    	
+    	if(!needLocation) {
+    		Log.d("NearbyMetars", "Skipping waiting for location");
+    		return;
+    	}
     	
     	Log.d("NearbyMetars", "Need to get METAR data");
     	waitForLocationDlg = ProgressDialog.show(this, "Wait for location", "Determining location, stand-by", true, true);

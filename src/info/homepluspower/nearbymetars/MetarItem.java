@@ -4,6 +4,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.android.maps.GeoPoint;
@@ -11,7 +13,12 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
 import com.google.android.maps.Projection;
 
-public class MetarItem extends OverlayItem {
+public class MetarItem extends OverlayItem implements Parcelable {
+
+	public MetarItem(GeoPoint point, java.lang.String title, java.lang.String snippet) {
+		super(point, title, snippet);
+	}
+	
 	public static enum SkyConds {
 		SKC,
 		CLR,
@@ -139,5 +146,36 @@ public class MetarItem extends OverlayItem {
 			}
 			
 		}
+	}
+
+	public static final Parcelable.Creator<MetarItem> CREATOR = new Parcelable.Creator<MetarItem>() {
+		public MetarItem createFromParcel(Parcel in) {
+			return new MetarItem(in);
+		}
+		
+		public MetarItem[] newArray(int size) {
+			return new MetarItem[size];
+		}
+	};
+	
+	private MetarItem(Parcel in) {
+		super(new GeoPoint(in.readInt(), in.readInt()), in.readString(), in.readString());
+		skyCond = SkyConds.valueOf(in.readString());
+		windDir = in.readDouble();
+		windSpeed = in.readInt();
+	}
+	
+	public int describeContents() {
+		return 0;
+	}
+
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(this.mPoint.getLatitudeE6());
+		dest.writeInt(this.mPoint.getLongitudeE6());
+		dest.writeString(this.mTitle);
+		dest.writeString(this.mSnippet);
+		dest.writeString(skyCond.toString());
+		dest.writeDouble(windDir);
+		dest.writeInt(windSpeed);
 	}
 }
