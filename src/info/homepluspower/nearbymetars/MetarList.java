@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.maps.ItemizedOverlay;
@@ -64,8 +65,15 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	
 	public void reset() {
 		Log.v("NearbyMetars", "Clearing overlay items");
-
 		mOverlays.clear();
 		populate();
+	}
+	
+	public void saveListToBundle(Bundle outState) {
+		outState.putParcelableArrayList("metarlist", mOverlays);
+	}
+	
+	public void getListFromBundle(Bundle savedInstanceState) {
+		mOverlays = savedInstanceState.getParcelableArrayList("metarlist");
 	}
 }
