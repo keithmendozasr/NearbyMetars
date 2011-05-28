@@ -15,7 +15,7 @@ import com.google.android.maps.OverlayItem;
 public class MetarList extends ItemizedOverlay<MetarItem> {
 	
 	private ArrayList<MetarItem> mOverlays = new ArrayList<MetarItem>();
-	private Context mContext; 
+	private Context mContext;
 	
 	public MetarList(Drawable defaultMarker, Context context) {
 		super(boundCenter(defaultMarker));
@@ -31,7 +31,7 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	
 	@Override
 	protected MetarItem createItem(int i) {
-			return mOverlays.get(i);
+		return mOverlays.get(i);
 	}
 
 	@Override
