@@ -58,8 +58,8 @@ public class MetarItem extends OverlayItem implements Parcelable {
 		float project = (float)(projection.metersToEquatorPixels((float)1609.344));
 		if(project < 10 )
 			project = 10.0f;
-		Log.d("NearbyMetars", "Value of project: " + Float.toString(project));
-		Log.d("NearbyMetars", "Value of point: " + point.toString());
+		Log.v("NearbyMetars", "Value of project: " + Float.toString(project));
+		Log.v("NearbyMetars", "Value of point: " + point.toString());
 		final RectF drawPos = new RectF(point.x-project, point.y-project, point.x+project, point.y+project);
 		
 		//Get the paint to use for drawing the icons
@@ -134,12 +134,12 @@ public class MetarItem extends OverlayItem implements Parcelable {
 				endX -= (float)(barbSpace*Math.sin(windDir));
 				endY += (float)(barbSpace*Math.cos(windDir));
 				
-				Log.d("NearbyMetars", "New value of endX: " + Float.toString(endX) +" New value of endY: " + Float.toString(endY));
+				Log.v("NearbyMetars", "New value of endX: " + Float.toString(endX) +" New value of endY: " + Float.toString(endY));
 			}
 			
 			if((windSpeed % 10) > 0)
 			{
-				Log.d("NearbyMetars", "Drawing half-size barb");
+				Log.v("NearbyMetars", "Drawing half-size barb");
 				barbX = (float)(endX + (project/2) * Math.sin(barbAngle));
 				barbY = (float)(endY - (project/2) * Math.cos(barbAngle));
 				canvas.drawLine(endX, endY, barbX, barbY, paint);

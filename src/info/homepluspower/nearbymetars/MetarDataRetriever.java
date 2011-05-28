@@ -91,7 +91,8 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 					return;
 				}
 				
-				Log.d("NearbyMetars", "Inserting MetarItem\nLocation: " + location + "\nSky condition: " + skyCond.toString() + "\nWind direction: " + Integer.toString(windDir));
+				Log.d("NearbyMetars", "Inserting MetarItem");
+				Log.v("NearbyMetars", "Location: " + location + "\nSky condition: " + skyCond.toString() + "\nWind direction: " + Integer.toString(windDir));
 				MetarItem metarItem = new MetarItem(MetarItem.coordsToGeoPoint(latitude, longitude), location, rawMetar, skyCond, windDir, windSpeed);
 				list.addOverlay(metarItem);
 				skyCond = null;
