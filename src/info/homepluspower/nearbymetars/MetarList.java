@@ -75,5 +75,6 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	
 	public void getListFromBundle(Bundle savedInstanceState) {
 		mOverlays = savedInstanceState.getParcelableArrayList("metarlist");
+		populate();
 	}
 }
