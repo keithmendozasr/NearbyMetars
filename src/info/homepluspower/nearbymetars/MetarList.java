@@ -26,6 +26,7 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	public void addOverlay(MetarItem overlay) {
 		Log.v("NearbyMetars", "Adding overlay item");
 		mOverlays.add(overlay);
+		setLastFocusedIndex(-1);
 		populate();
 	}
 	
@@ -66,6 +67,7 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	public void reset() {
 		Log.v("NearbyMetars", "Clearing overlay items");
 		mOverlays.clear();
+		setLastFocusedIndex(-1);
 		populate();
 	}
 	
@@ -75,6 +77,7 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	
 	public void getListFromBundle(Bundle savedInstanceState) {
 		mOverlays = savedInstanceState.getParcelableArrayList("metarlist");
+		setLastFocusedIndex(-1);
 		populate();
 	}
 }
