@@ -2,6 +2,7 @@ package info.homepluspower.nearbymetars;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.Parcel;
@@ -113,21 +114,48 @@ public class MetarItem extends OverlayItem implements Parcelable {
 			canvas.drawLine(point.x, point.y, endX, endY, paint);
 			
 			//Draw the wind speed
-			Log.d("NearbyMetars", "Drawing wind barb");
-			final double barbAngle = windDir + degToRad(80);
-			final int barbSpace = (int)dirLen/8;
-			float barbX, barbY;
-			
-			if(windSpeed > 50)
-			{
-				Log.d("NearbyMetars", "Windspeed over 50, not drawing wind barb");
+			if(windSpeed > 100) {
+				Log.w("NearbyMetars", "Wind speed " + Integer.toString(windSpeed) + " will not be displayed graphically");
 				return;
 			}
+			
+			Log.d("NearbyMetars", "Drawing wind barb");
+			double barbAngle;
+			final int barbSpace = (int)dirLen/8;
+			float barbX, barbY;
 			
 			if(project<=10)
 				project = 20;
 			
-			for(int i=0; i<(int)(windSpeed/10); i++) {
+			barbAngle = windDir + degToRad(90);
+			int tmpWindSpeed = windSpeed;
+			if(tmpWindSpeed >= 50)
+			{
+				float startX = endX;
+				float startY = endY;
+				
+				paint.setStyle(Paint.Style.FILL_AND_STROKE);
+				
+				Log.d("NearbyMetars", "Windspeed over 50");
+				Path barbPath = new Path();
+				barbPath.moveTo(endX, endY);
+				endX -= (float)(barbSpace*Math.sin(windDir));
+				endY += (float)(barbSpace*Math.cos(windDir));
+				barbPath.lineTo((float)(endX + project * Math.sin(barbAngle)), (float)(endY - project * Math.cos(barbAngle)));
+				endX -= (float)(barbSpace*Math.sin(windDir));
+				endY += (float)(barbSpace*Math.cos(windDir));
+				barbPath.lineTo(endX, endY);
+				barbPath.lineTo(startX, startY);
+				
+				canvas.drawPath(barbPath, paint);
+				tmpWindSpeed -= 50;
+				
+				endX -= (float)(barbSpace*Math.sin(windDir));
+				endY += (float)(barbSpace*Math.cos(windDir));
+			}
+			
+			barbAngle = windDir + degToRad(80);
+			for(int i=0; i<(int)(tmpWindSpeed/10); i++) {
 				barbX = (float)(endX + project * Math.sin(barbAngle));
 				barbY = (float)(endY - project * Math.cos(barbAngle));
 				canvas.drawLine(endX, endY, barbX, barbY, paint);
@@ -137,7 +165,7 @@ public class MetarItem extends OverlayItem implements Parcelable {
 				Log.v("NearbyMetars", "New value of endX: " + Float.toString(endX) +" New value of endY: " + Float.toString(endY));
 			}
 			
-			if((windSpeed % 10) > 0)
+			if((tmpWindSpeed % 10) > 0)
 			{
 				Log.v("NearbyMetars", "Drawing half-size barb");
 				barbX = (float)(endX + (project/2) * Math.sin(barbAngle));
