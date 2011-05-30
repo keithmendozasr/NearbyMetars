@@ -63,6 +63,14 @@ public class MetarItem extends OverlayItem implements Parcelable {
 		Log.v("NearbyMetars", "Value of point: " + point.toString());
 		final RectF drawPos = new RectF(point.x-project, point.y-project, point.x+project, point.y+project);
 		
+		//Verify that it's worth drawing the icon on screen
+		if(canvas.quickReject(drawPos, Canvas.EdgeType.AA)) {
+			Log.d("NearbyMetars", "Not drawing icon for " + this.mTitle);
+			return;
+		}
+		
+		Log.d("NearbyMetars", "Drawing icon for " + this.mTitle);
+		
 		//Get the paint to use for drawing the icons
 		Paint paint = new Paint();
 		paint.setStyle(Paint.Style.STROKE);
