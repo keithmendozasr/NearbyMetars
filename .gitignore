@@ -1,4 +1,4 @@
-*.apk
-bin/*
-gen/*
+mobile/*.apk
+mobile/bin/*
+mobile/gen/*
 !.gitignore
