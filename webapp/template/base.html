@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>SCC Neighborhood Adoption Mobile Request Server</title>
+        {% block stylesheets %}
+        {% endblock stylesheets %}
+        <style type="text/css">
+            div {
+                position: relative;
+            }
+            
+            div.topbox {
+                width: 1024px;
+                margin: auto;
+                display: table;
+            }
+            
+            div.leftcol {
+                width: 204px;
+                display: table-cell;
+                border-right: solid black 2px;
+            }
+            
+            div.contentcol {
+                width: 820px;
+                display: table-cell;
+            }
+            
+            div.showtable {
+                display: table;
+                margin: auto;
+            }
+            
+            div.tblrow {
+                display: table-row;
+            }
+            
+            div.cell {
+               display: table-cell;
+               border: solid black 1px;
+               padding: 2px 2px 2px 2px;
+               vertical-align: top;
+            }
+        </style>
+        {% block scripts %}
+        {% endblock scripts %}
+    </head>
+    <body style="position: relative">
+        <div style="text-align: center"><h1>SCC Neighborhood Adoption</h1></div>
+        <div class="topbox">
+            <div class="leftcol">
+                <div><small>Logged in as {{ nickname }}</small></div>
+                <div style="text-align: center"><p>Menu</p></div>
+                <ul>
+                    {% if isadmin %}
+                        <li><a href="/testform">Test Form</a></li>
+                        <li><a href="/admin">Admin</a></li>
+                    {% endif %}
+                    <li><a href="{{ logout_url }}">Logout</a></li>
+                </ul>
+            </div>
+            <div class="contentcol">
+                {% block content %}
+                {% endblock content %}
+            </div>
+        </div>
+        <div class="topbox" style="border-top: solid black 1px;"><small>{{ appversion|safe }}</small></div>
+    </body>
+</html>
