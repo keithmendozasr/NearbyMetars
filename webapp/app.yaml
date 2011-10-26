@@ -7,3 +7,6 @@ handlers:
 - url: /
   script: main.py
   login: admin
+  
+- url: /getloc
+  script: main.py
