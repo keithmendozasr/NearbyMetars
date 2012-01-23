@@ -3,12 +3,12 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent" android:orientation="vertical">
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="NOT FOR NAVIGATION" android:textColor="#FF0000" android:textSize="20sp" android:textStyle="bold"></TextView>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/not_for_nav" android:textColor="#FF0000" android:textSize="20sp" android:textStyle="bold"></TextView>
 	
 <com.google.android.maps.MapView
 	android:id="@+id/mapview"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:clickable="true"
-    android:apiKey="ENTER KEY HERE" />
+    android:apiKey="0xWU83z0wooxfD7t2VpGyiw1PNVHJ6Lfd5fVeOg" />
 </LinearLayout>    
