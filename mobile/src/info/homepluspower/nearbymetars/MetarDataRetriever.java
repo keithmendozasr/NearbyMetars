@@ -146,7 +146,7 @@ public class MetarDataRetriever extends AsyncTask<Object, Void, Void> implements
 		MetarList list = (MetarList)params[0];
 		Location location = (Location)params[1];
 		
-		String url = "http://weather.aero/dataserver1_4/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=1&mostRecentForEachStation=constraint&radialDistance=50;" + Double.toString(location.getLongitude()) + "," + Double.toString(location.getLatitude());
+		String url = callerContext.getString(R.string.adds_url) + "dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=1&mostRecentForEachStation=constraint&radialDistance=50;" + Double.toString(location.getLongitude()) + "," + Double.toString(location.getLatitude());
 		list.reset();
 		Log.d("NearbyMetars", "URL to use: " + url);
 		try {
