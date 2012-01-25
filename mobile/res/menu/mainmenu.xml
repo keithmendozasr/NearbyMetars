@@ -19,4 +19,5 @@
     <item android:title="@string/menu_getfromhere" android:id="@+id/getmetar"></item>
     <item android:id="@+id/getmetarloc" android:title="@string/menu_getmetarlocation"></item>
     <item android:id="@+id/showabout" android:title="@string/menu_about"></item>
+    <item android:id="@+id/satmode" android:checkable="true" android:title="@string/satmode" android:checked="false"></item>
 </menu>

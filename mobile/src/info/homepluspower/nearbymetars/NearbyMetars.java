@@ -18,6 +18,7 @@ package info.homepluspower.nearbymetars;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.location.Location;
@@ -145,6 +146,7 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     	Log.d(logTag, "Need to get METAR data");
     	waitForLocationDlg = ProgressDialog.show(this, "Wait for location", "Determining location, stand-by", true, true);
     	
+    	mapView.setSatellite(getPreferences(MODE_PRIVATE).getBoolean("satmode", false));
     	startLocationListener();
     }
     
@@ -161,6 +163,10 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     	Log.d(logTag, "Pause");
     	cancelWaitForLocation();
     	stopLocationListener();
+    	
+    	getPreferences(Activity.MODE_PRIVATE).edit()
+    		.putBoolean("satmode", mapView.isSatellite())
+    		.commit();
     }
 
     private void getMetarAndCenter(Location location) {
@@ -231,8 +237,25 @@ public class NearbyMetars extends MapActivity implements LocationListener {
 			dialog.setView(textView);
 			dialog.show();
 			return true;
+		case R.id.satmode:
+			boolean newVal = !item.isChecked();
+			mapView.setSatellite(newVal);
+			item.setChecked(newVal);
+			item.setTitle((newVal ? R.string.satmode_check : R.string.satmode));
+			return true;
+			
 		default:
 			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)
+	{
+		MenuItem item = menu.findItem(R.id.satmode);
+		item.setChecked(mapView.isSatellite());
+		item.setTitle((mapView.isSatellite() ? R.string.satmode_check : R.string.satmode));
+		
+		return true;
 	}
 }

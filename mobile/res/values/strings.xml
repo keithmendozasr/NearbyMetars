@@ -24,4 +24,5 @@
     <string name="not_for_nav">NOT FOR NAVIGATION</string>
     <string name="show_taf">Show TAF</string>
     <string name="hide_taf">Hide TAF</string>
+    <string name="satmode_check">\u2714 Satelite View</string><string name="satmode">Satelite View</string>
 </resources>
