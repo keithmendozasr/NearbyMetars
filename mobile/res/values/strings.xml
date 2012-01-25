@@ -18,7 +18,7 @@
     <string name="app_name">Nearby Metars</string>
     <string name="menu_getfromhere">Get METARS around map center</string>
     <string name="menu_getmetarlocation">Get METARS from my location</string>
-    <string name="app_version">01.03.0.0</string>
+    <string name="app_version">01.03.0.3</string>
     <string name="menu_about">About</string>
     <string name="adds_url">http://weather.aero/dataserver1_4/httpparam?</string>
     <string name="not_for_nav">NOT FOR NAVIGATION</string>
