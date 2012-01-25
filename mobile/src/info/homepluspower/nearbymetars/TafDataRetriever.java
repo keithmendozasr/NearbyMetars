@@ -51,11 +51,11 @@ public class TafDataRetriever extends AsyncTask<Object, Void, Void> implements D
 		@Override
 		public void endElement(String URI, String localName, String qName) throws SAXException {
 			if(isCancelled()) {
-				Log.d("NearbyMetars", "Parsing cancel detected at endElement");
+				Log.d(logTag, "Parsing cancel detected at endElement");
 				throw new SAXException("parsing cancelled");
 			}
 			
-			Log.v("NearbyMetars", "End element: " + localName);
+			Log.v(logTag, "End element: " + localName);
 		
 			if(localName.equals("raw_text"))
 				rawTaf = text;			
@@ -98,16 +98,16 @@ public class TafDataRetriever extends AsyncTask<Object, Void, Void> implements D
 			parser.parse(url, tafParser);
 		} catch(SAXException e) {
 			if(isCancelled())
-				Log.d("NearbyMetars", "Cancelling parsing");
+				Log.d(logTag, "Cancelling parsing");
 			else {
-				Log.e("NearbyMetars", "Parsing exception: " + e.getMessage());
+				Log.e(logTag, "Parsing exception: " + e.getMessage());
 				toastMsg = new String("Parsing exception: " + e.getMessage());
 			}	
 		} catch(IOException e) {
-			Log.e("NearbyMetars", "Failed to retrieve data");
+			Log.e(logTag, "Failed to retrieve data");
 			toastMsg = new String("Failed to retrieve METAR data, try again later");
 		} catch(ParserConfigurationException e) {
-			Log.e("NearbyMetars", "No matching SAX parser");
+			Log.e(logTag, "No matching SAX parser");
 			toastMsg = new String("No matching SAX parser.");
 		}
 		return null;
@@ -115,10 +115,10 @@ public class TafDataRetriever extends AsyncTask<Object, Void, Void> implements D
 	
 	@Override
 	protected void onPostExecute (Void result) {
-		Log.v("NearbyMetars", "onPostExecute");
+		Log.v(logTag, "onPostExecute");
 		
 		if(toastMsg != null) {
-			Log.v("NearbyMetars", "Showing toast message");
+			Log.v(logTag, "Showing toast message");
 			Toast.makeText(callerContext, toastMsg, Toast.LENGTH_LONG).show();
 		}
 		

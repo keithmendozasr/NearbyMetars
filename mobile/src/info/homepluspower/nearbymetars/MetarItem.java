@@ -30,7 +30,8 @@ import com.google.android.maps.OverlayItem;
 import com.google.android.maps.Projection;
 
 public class MetarItem extends OverlayItem implements Parcelable {
-
+	private static final String logTag = "MetarItem";
+	
 	public MetarItem(GeoPoint point, java.lang.String title, java.lang.String snippet) {
 		super(point, title, snippet);
 	}
@@ -74,17 +75,17 @@ public class MetarItem extends OverlayItem implements Parcelable {
 		float project = (float)(projection.metersToEquatorPixels((float)1609.344));
 		if(project < 10 )
 			project = 10.0f;
-		Log.v("NearbyMetars", "Value of project: " + Float.toString(project));
-		Log.v("NearbyMetars", "Value of point: " + point.toString());
+		Log.v(logTag, "Value of project: " + Float.toString(project));
+		Log.v(logTag, "Value of point: " + point.toString());
 		final RectF drawPos = new RectF(point.x-project, point.y-project, point.x+project, point.y+project);
 		
 		//Verify that it's worth drawing the icon on screen
 		if(canvas.quickReject(drawPos, Canvas.EdgeType.AA)) {
-			Log.d("NearbyMetars", "Not drawing icon for " + this.mTitle);
+			Log.d(logTag, "Not drawing icon for " + this.mTitle);
 			return;
 		}
 		
-		Log.d("NearbyMetars", "Drawing icon for " + this.mTitle);
+		Log.d(logTag, "Drawing icon for " + this.mTitle);
 		
 		//Get the paint to use for drawing the icons
 		Paint paint = new Paint();
@@ -138,11 +139,11 @@ public class MetarItem extends OverlayItem implements Parcelable {
 			
 			//Draw the wind speed
 			if(windSpeed > 100) {
-				Log.w("NearbyMetars", "Wind speed " + Integer.toString(windSpeed) + " will not be displayed graphically");
+				Log.w(logTag, "Wind speed " + Integer.toString(windSpeed) + " will not be displayed graphically");
 				return;
 			}
 			
-			Log.d("NearbyMetars", "Drawing wind barb");
+			Log.d(logTag, "Drawing wind barb");
 			double barbAngle;
 			final int barbSpace = (int)dirLen/8;
 			float barbX, barbY;
@@ -159,7 +160,7 @@ public class MetarItem extends OverlayItem implements Parcelable {
 				
 				paint.setStyle(Paint.Style.FILL_AND_STROKE);
 				
-				Log.d("NearbyMetars", "Windspeed over 50");
+				Log.d(logTag, "Windspeed over 50");
 				Path barbPath = new Path();
 				barbPath.moveTo(endX, endY);
 				endX -= (float)(barbSpace*Math.sin(windDir));
@@ -185,12 +186,12 @@ public class MetarItem extends OverlayItem implements Parcelable {
 				endX -= (float)(barbSpace*Math.sin(windDir));
 				endY += (float)(barbSpace*Math.cos(windDir));
 				
-				Log.v("NearbyMetars", "New value of endX: " + Float.toString(endX) +" New value of endY: " + Float.toString(endY));
+				Log.v(logTag, "New value of endX: " + Float.toString(endX) +" New value of endY: " + Float.toString(endY));
 			}
 			
 			if((tmpWindSpeed % 10) > 0)
 			{
-				Log.v("NearbyMetars", "Drawing half-size barb");
+				Log.v(logTag, "Drawing half-size barb");
 				barbX = (float)(endX + (project/2) * Math.sin(barbAngle));
 				barbY = (float)(endY - (project/2) * Math.cos(barbAngle));
 				canvas.drawLine(endX, endY, barbX, barbY, paint);

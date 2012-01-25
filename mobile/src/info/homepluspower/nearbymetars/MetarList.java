@@ -31,6 +31,7 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	
 	private ArrayList<MetarItem> mOverlays = new ArrayList<MetarItem>();
 	private Context mContext;
+	private static final String logTag = "MetarList";
 	
 	public MetarList(Drawable defaultMarker, Context context) {
 		super(boundCenter(defaultMarker));
@@ -39,7 +40,7 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	}
 	
 	public void addOverlay(MetarItem overlay) {
-		Log.v("NearbyMetars", "Adding overlay item");
+		Log.v(logTag, "Adding overlay item");
 		mOverlays.add(overlay);
 		setLastFocusedIndex(-1);
 		populate();
@@ -52,13 +53,13 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 
 	@Override
 	public int size() {
-		Log.v("NearbyMetars", "size called, returning " + Integer.toString(mOverlays.size()));
+		Log.v(logTag, "size called, returning " + Integer.toString(mOverlays.size()));
 		return mOverlays.size();
 	}
 
 	@Override
 	protected boolean onTap(int index) {
-		Log.v("NearbyMetars", "Item tapped with index " + Integer.toString(index));
+		Log.v(logTag, "Item tapped with index " + Integer.toString(index));
 		OverlayItem item = mOverlays.get(index);
 		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
 		dialog.setTitle(item.getTitle());
@@ -70,7 +71,7 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	@Override
 	public void draw(android.graphics.Canvas canvas, MapView mapView, boolean shadow) {
 		if(!shadow) {
-			Log.v("NearbyMetars", "Drawing items");
+			Log.v(logTag, "Drawing items");
 			MetarItem item;
 			for(int i=0; i<mOverlays.size(); i++) {
 				item = mOverlays.get(i);
@@ -80,7 +81,7 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	}
 	
 	public void reset() {
-		Log.v("NearbyMetars", "Clearing overlay items");
+		Log.v(logTag, "Clearing overlay items");
 		mOverlays.clear();
 		setLastFocusedIndex(-1);
 		populate();

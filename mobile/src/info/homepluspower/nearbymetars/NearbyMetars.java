@@ -42,6 +42,8 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 
 public class NearbyMetars extends MapActivity implements LocationListener {
+	private static final String logTag = "NearbyMetars";
+	
 	private static MapView mapView;
 	private static MetarList metarList = null;
 	private static LocationManager locationManager;
@@ -55,16 +57,16 @@ public class NearbyMetars extends MapActivity implements LocationListener {
      */
     private void getMetarData(Location location) {
     	if(dataRetriever!= null && dataRetriever.getStatus() == AsyncTask.Status.RUNNING) {
-    		Log.d("NearbyMetars", "In the middle of another processing. Stop that one");
+    		Log.d(logTag, "In the middle of another processing. Stop that one");
     		dataRetriever.cancel(true);
     		try {
     			dataRetriever.get();
     		} catch(Exception e) {
-    			Log.d("NearbyMetars", "Previous processing stopped");
+    			Log.d(logTag, "Previous processing stopped");
     		}
     	}
     	else
-    		Log.d("NearbyMetars", "No running process");
+    		Log.d(logTag, "No running process");
     		
     	dataRetriever = (MetarDataRetriever) new MetarDataRetriever(NearbyMetars.this, mapView).execute(metarList, location);
     	lastLoad = Calendar.getInstance();
@@ -75,7 +77,7 @@ public class NearbyMetars extends MapActivity implements LocationListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        Log.d("NearbyMetars", "onCreate called");
+        Log.d(logTag, "onCreate called");
         locationManager = (LocationManager)this.getSystemService(LOCATION_SERVICE);
         
         mapView = (MapView)findViewById(R.id.mapview);
@@ -85,14 +87,14 @@ public class NearbyMetars extends MapActivity implements LocationListener {
         metarList = new MetarList(getResources().getDrawable(R.drawable.overlaydefault), mapView.getContext());
 
         if(savedInstanceState != null) {
-        	Log.d("NearbyMetars", "savedInstanceState not null. Getting last load time from bundle");
+        	Log.d(logTag, "savedInstanceState not null. Getting last load time from bundle");
         
         	//Load last metar list and time last retrieved
         	lastLoad = (Calendar) savedInstanceState.getSerializable("lastloadtime");
         	metarList.getListFromBundle(savedInstanceState);
         }
         else
-        	Log.d("NearbyMetars", "savedInstanceState null.");
+        	Log.d(logTag, "savedInstanceState null.");
         	
         mapView.getOverlays().add(metarList);
     }
@@ -100,7 +102,7 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
     	super.onSaveInstanceState(outState);
-    	Log.d("NearbyMetars", "Saving metarList to bundle");
+    	Log.d(logTag, "Saving metarList to bundle");
     	outState.putSerializable("lastloadtime", lastLoad);
     	metarList.saveListToBundle(outState);
     }
@@ -122,25 +124,25 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     @Override
     protected void onResume() {
     	super.onResume();
-    	Log.d("NearbyMetars", "Resume");
+    	Log.d(logTag, "Resume");
     	
     	if(lastLoad != null) {
     		//Stuff for debugging
         	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        	Log.d("NearbyMetars", "Value of lastLoad: " + sdf.format(lastLoad.getTime()));
+        	Log.d(logTag, "Value of lastLoad: " + sdf.format(lastLoad.getTime()));
         	
         	Calendar curTime = Calendar.getInstance();
         	curTime.add(Calendar.HOUR, -1);
-        	Log.d("NearbyMetars", "Current time minus 1 hour: " + sdf.format(curTime.getTime()));
+        	Log.d(logTag, "Current time minus 1 hour: " + sdf.format(curTime.getTime()));
         	if(curTime.before(lastLoad)) {
-        		Log.d("NearbyMetars", "Using saved metar list");
+        		Log.d(logTag, "Using saved metar list");
         		return;
         	}
         	else
-        		Log.d("NearbyMetars", "Saved data too old");
+        		Log.d(logTag, "Saved data too old");
     	}
     	
-    	Log.d("NearbyMetars", "Need to get METAR data");
+    	Log.d(logTag, "Need to get METAR data");
     	waitForLocationDlg = ProgressDialog.show(this, "Wait for location", "Determining location, stand-by", true, true);
     	
     	startLocationListener();
@@ -156,7 +158,7 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     @Override
     protected void onPause() {
     	super.onPause();
-    	Log.d("NearbyMetars", "Pause");
+    	Log.d(logTag, "Pause");
     	cancelWaitForLocation();
     	stopLocationListener();
     }
@@ -170,7 +172,7 @@ public class NearbyMetars extends MapActivity implements LocationListener {
     }
     
     public void onLocationChanged(Location location) {
-		Log.d("NearbyMetars", "Got new location");
+		Log.d(logTag, "Got new location");
 		getMetarAndCenter(location);
 		stopLocationListener();
 	}
@@ -205,7 +207,7 @@ public class NearbyMetars extends MapActivity implements LocationListener {
 			getMetarData(location);
 			return true;
 		case R.id.getmetarloc:
-			Log.v("NearbyMetars", "Get metar at current location from GPS");
+			Log.v(logTag, "Get metar at current location from GPS");
 			startLocationListener();
 			return true;
 		case R.id.showabout:
