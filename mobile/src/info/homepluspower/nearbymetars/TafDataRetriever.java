@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -123,8 +124,14 @@ public class TafDataRetriever extends AsyncTask<Object, Void, Void> implements D
 		}
 		
 		Log.d(logTag, "Done retrieving TAF data");
-		txtView.setText(tafParser.rawTaf);
-		showBtn.setClickable(true);
+		if(tafParser.rawTaf != null)
+		{
+			txtView.setText(tafParser.rawTaf);
+			showBtn.setVisibility(View.VISIBLE);
+		}
+		else
+			Log.d(logTag, "No TAF data for this location");
+		
 	}
 	
 	public void onCancel(DialogInterface dialog) {

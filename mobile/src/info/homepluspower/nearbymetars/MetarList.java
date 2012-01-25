@@ -17,11 +17,15 @@ package info.homepluspower.nearbymetars;
 
 import java.util.ArrayList;
 
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
@@ -32,6 +36,8 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 	private ArrayList<MetarItem> mOverlays = new ArrayList<MetarItem>();
 	private Context mContext;
 	private static final String logTag = "MetarList";
+	
+	private TextView metarTxt;
 	
 	public MetarList(Drawable defaultMarker, Context context) {
 		super(boundCenter(defaultMarker));
@@ -56,15 +62,44 @@ public class MetarList extends ItemizedOverlay<MetarItem> {
 		Log.v(logTag, "size called, returning " + Integer.toString(mOverlays.size()));
 		return mOverlays.size();
 	}
-
+	
 	@Override
 	protected boolean onTap(int index) {
 		Log.v(logTag, "Item tapped with index " + Integer.toString(index));
 		OverlayItem item = mOverlays.get(index);
-		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+		
+		final Dialog dialog = new Dialog(mContext);
+		dialog.setContentView(R.layout.metar_taf);
 		dialog.setTitle(item.getTitle());
-		dialog.setMessage(item.getSnippet());
+		
+		metarTxt = (TextView)dialog.findViewById(R.id.metarText);
+		metarTxt.setText(item.getSnippet());
+		
+		Button showBtn = (Button)dialog.findViewById(R.id.tafBtn);
+		showBtn.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				Log.v(logTag, "Got click from tafBtn");
+				TextView txtBox = (TextView)dialog.findViewById(R.id.tafText);
+				switch(txtBox.getVisibility())
+				{
+				case View.VISIBLE:
+					txtBox.setVisibility(View.GONE);
+					((Button)arg0).setText(R.string.show_taf);
+					break;
+				case View.GONE:
+					txtBox.setVisibility(View.VISIBLE);
+					((Button)arg0).setText(R.string.hide_taf);
+					break;
+				default:
+					break;
+				}
+			}
+		});
+		
 		dialog.show();
+		Log.v(logTag, "Dialog shown. Waiting for TAF data");
+		
+		new TafDataRetriever(mContext, (TextView)dialog.findViewById(R.id.tafText), (Button)dialog.findViewById(R.id.tafBtn)).execute(item.getTitle());
 		return true;
 	}
 	

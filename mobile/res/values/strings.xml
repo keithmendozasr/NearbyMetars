@@ -22,4 +22,6 @@
     <string name="menu_about">About</string>
     <string name="adds_url">http://weather.aero/dataserver1_4/httpparam?</string>
     <string name="not_for_nav">NOT FOR NAVIGATION</string>
+    <string name="show_taf">Show TAF</string>
+    <string name="hide_taf">Hide TAF</string>
 </resources>
